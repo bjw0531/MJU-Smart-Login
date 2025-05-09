@@ -1,23 +1,28 @@
-window.addEventListener('load', () => {
+import * as utils from './utils.js';
+
+window.addEventListener('load', async () => {
     const id_field = document.getElementById('id');
     const pw_field = document.getElementById('passwrd');
+    
+    const [uid, storage] = await Promise.all([
+        utils.getUserId(),
+        utils.getStorageData()
+    ]);
 
-    chrome.storage.sync.get(['userId', 'password', 'autoLogin'], (result) => {
-        if (result.userId) {
-            id_field.value = result.userId;
-        }
-        
-        if (result.password) {
-            pw_field.value = result.password;
-        }
+    if (storage.autoLogin !== 'true') {
+        return;
+    }
 
-        if (result.autoLogin !== 'true') {
-            return;
-        }
-        
-        const loginButton = document.getElementById('loginButton');
-        if (loginButton) {
-            loginButton.click();
-        }
-    });
+    if (storage.userId) {
+        id_field.value = storage.userId;
+    }
+    
+    if (storage.password) {
+        pw_field.value = storage.password;
+    }   
+
+    const loginButton = document.getElementById('loginButton');
+    if (loginButton) {
+        loginButton.click();
+    }
 });

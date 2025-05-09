@@ -1,22 +1,29 @@
-window.addEventListener('load', () => {
+import * as utils from './utils.js';
+
+window.addEventListener('load', async () => {
   const id_field = document.getElementById('userId');
   const pw_field = document.getElementById('password');
   const toggle = document.getElementById('toggle');
   toggle.addEventListener('click', toggleAutoLogin);
+  
+  const [uid, storage] = await Promise.all([
+    utils.getUserId(),
+    utils.getStorageData()
+  ]);
 
-  chrome.storage.sync.get(['userId', 'password', 'autoLogin'], (result) => {
-    if (result.userId) {
-      id_field.value = result.userId;
-    }
-    if (result.password) {
-      pw_field.value = result.password;
-    }
-    if (result.autoLogin === 'true') {
-      toggle.checked = true;
-    } else {
-      toggle.checked = false;
-    }
-  });
+  if (storage.autoLogin === 'true') {
+    toggle.checked = true;
+  }
+
+  if (storage.userId) {
+    id_field.value = storage.userId;
+  }
+
+  if (storage.password) {
+    const uid = await utils.getUserUid();
+    const plain = await utils.decrypt(storage.password, uid);
+    pw_field.value = plain;
+  }
 });
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
@@ -28,17 +35,19 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     return;
   }
 
-  chrome.storage.sync.set({ userId, password }, () => {
-    showToast('저장 완료!');
-  });
+  const uid = await utils.getUserUid();
+  const encrypted = await utils.encrypt(password, uid);
+  utils.setStorageData({ 'userId' : userId, 'password': encrypted })
+    .then(() => {
+      console.log(encrypted);
+      showToast('저장 완료!');
+    });
+
 });
 
 function toggleAutoLogin() {
   const toggle = document.getElementById('toggle');
-
-  chrome.storage.sync.set({
-    autoLogin: toggle.checked ? 'true' : 'false'
-  });
+  utils.setStorageData({ autoLogin: toggle.checked ? 'true' : 'false' });
 }
 
 function showToast(message) {
