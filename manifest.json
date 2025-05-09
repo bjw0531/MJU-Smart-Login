@@ -15,7 +15,7 @@
     },
     "content_scripts": [
         {
-            "js": ["content.js"],
+            "js": ["utils.js", "content.js"],
             "matches": [
                 "https://sso1.mju.ac.kr/login.do*"
             ]

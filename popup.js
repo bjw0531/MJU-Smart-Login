@@ -1,15 +1,10 @@
-import * as utils from './utils.js';
-
 window.addEventListener('load', async () => {
   const id_field = document.getElementById('userId');
   const pw_field = document.getElementById('password');
   const toggle = document.getElementById('toggle');
   toggle.addEventListener('click', toggleAutoLogin);
   
-  const [uid, storage] = await Promise.all([
-    utils.getUserId(),
-    utils.getStorageData()
-  ]);
+  const storage = await getStorageData();
 
   if (storage.autoLogin === 'true') {
     toggle.checked = true;
@@ -19,9 +14,8 @@ window.addEventListener('load', async () => {
     id_field.value = storage.userId;
   }
 
-  if (storage.password) {
-    const uid = await utils.getUserUid();
-    const plain = await utils.decrypt(storage.password, uid);
+  if (storage.password && storage.uid) {
+    const plain = await decrypt(storage.password, storage.uid);
     pw_field.value = plain;
   }
 });
@@ -29,25 +23,28 @@ window.addEventListener('load', async () => {
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const userId = document.getElementById('userId').value;
   const password = document.getElementById('password').value;
-
+  
   if (!userId || !password) {
     showToast('아이디와 비밀번호를 모두 입력하세요.');
     return;
   }
+  
+  const uid = await getUserUid();
 
-  const uid = await utils.getUserUid();
-  const encrypted = await utils.encrypt(password, uid);
-  utils.setStorageData({ 'userId' : userId, 'password': encrypted })
+  const encrypted = await encrypt(password, uid);
+  setStorageData({ 'userId' : userId, 'password': encrypted, 'uid': uid })
     .then(() => {
       console.log(encrypted);
       showToast('저장 완료!');
     });
 
+  console.log(await getStorageData());
+
 });
 
 function toggleAutoLogin() {
   const toggle = document.getElementById('toggle');
-  utils.setStorageData({ autoLogin: toggle.checked ? 'true' : 'false' });
+  setStorageData({ autoLogin: toggle.checked ? 'true' : 'false' });
 }
 
 function showToast(message) {

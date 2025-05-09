@@ -1,4 +1,4 @@
-export async function getUserId() {
+async function getUserId() {
 	return new Promise((resolve) => {
 		chrome.storage.local.get(["userId"], (result) => {
 			resolve(result.userId || null);
@@ -6,7 +6,7 @@ export async function getUserId() {
 	});
 }
 
-export async function getUserUid(){
+async function getUserUid(){
   return new Promise((resolve) => {
     chrome.identity.getProfileUserInfo((userInfo) => {
       resolve(userInfo.id || null);
@@ -14,15 +14,15 @@ export async function getUserUid(){
   });
 }
 
-export async function getStorageData() {
+async function getStorageData() {
 	return new Promise((resolve) => {
-		chrome.storage.local.get(["userId", "password", "autoLogin"], (result) => {
+		chrome.storage.local.get(["userId", "password", "autoLogin", "uid"], (result) => {
 			resolve(result);
 		});
 	});
 }
 
-export async function setStorageData(data) {
+async function setStorageData(data) {
 	return new Promise((resolve) => {
 		chrome.storage.local.set(data, () => {
 			resolve();
@@ -35,7 +35,7 @@ const strToBuf = (str) => new TextEncoder().encode(str);
 const bufToStr = (buf) => new TextDecoder().decode(buf);
 
 // AES 키 생성
-export async function getKeyFromUid(uid) {
+async function getKeyFromUid(uid) {
   const baseKey = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(uid),
@@ -63,7 +63,7 @@ export async function getKeyFromUid(uid) {
 
 
 // 암호화
-export async function encrypt(text, key) {
+async function encrypt(text, key) {
   const encoded_key = await getKeyFromUid(key);
 
   const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -81,7 +81,7 @@ export async function encrypt(text, key) {
 }
 
 // 복호화
-export async function decrypt(base64Cipher, key) {
+async function decrypt(base64Cipher, key) {
   const encoded_key = await getKeyFromUid(key);
   const combined = Uint8Array.from(atob(base64Cipher), c => c.charCodeAt(0));
   const iv = combined.slice(0, 12);
