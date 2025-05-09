@@ -18,7 +18,9 @@ window.addEventListener('load', async () => {
     }
     
     if (storage.password) {
-        pw_field.value = storage.password;
+        const uid = await utils.getUserUid();
+        const plain = await utils.decrypt(storage.password, uid);
+        pw_field.value = plain;
     }   
 
     const loginButton = document.getElementById('loginButton');
