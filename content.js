@@ -1,6 +1,6 @@
 window.addEventListener('load', async () => {
-    const id_field = document.getElementById('id');
-    const pw_field = document.getElementById('passwrd');
+    const id_field = document.getElementById('input-userId');
+    const pw_field = document.getElementById('input-password');
     
     const storage = await getStorageData();
 
@@ -17,7 +17,7 @@ window.addEventListener('load', async () => {
         pw_field.value = plain;
     }   
 
-    const loginButton = document.getElementById('loginButton');
+    const loginButton = document.getElementsByClassName('login_bt')[0];
     if (loginButton) {
         loginButton.click();
     }

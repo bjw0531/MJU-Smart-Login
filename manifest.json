@@ -1,7 +1,7 @@
 {
     "name": "MJU Smart Login",
     "description": "명지대학교 통합 로그인 자동화",
-    "version": "1.1",
+    "version": "1.2",
     "manifest_version": 3,
     "icons": {
         "16": "icons/16.png",
@@ -17,7 +17,7 @@
         {
             "js": ["utils.js", "content.js"],
             "matches": [
-                "https://sso1.mju.ac.kr/login.do*"
+                "https://sso.mju.ac.kr/sso/auth*"
             ]
         }
     ],
@@ -27,6 +27,6 @@
         "identity.email"
     ],
     "host_permissions": [
-        "https://sso1.mju.ac.kr/*"
+        "https://sso.mju.ac.kr/*"
     ]
 }
